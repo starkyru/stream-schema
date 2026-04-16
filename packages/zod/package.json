@@ -1,0 +1,29 @@
+{
+  "name": "@stream-schema/zod",
+  "version": "0.1.0",
+  "description": "Zod schema integration for @stream-schema/react",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "zod": ">=3.0.0"
+  },
+  "dependencies": {
+    "@stream-schema/core": "workspace:*",
+    "@stream-schema/react": "workspace:*"
+  },
+  "keywords": ["zod", "streaming", "ai", "llm", "react", "schema"],
+  "license": "MIT"
+}

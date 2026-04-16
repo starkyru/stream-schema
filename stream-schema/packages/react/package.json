@@ -1,0 +1,28 @@
+{
+  "name": "@stream-schema/react",
+  "version": "0.1.0",
+  "description": "React hooks and headless primitives for streaming structured AI output",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "dependencies": {
+    "@stream-schema/core": "workspace:*"
+  },
+  "keywords": ["react", "streaming", "ai", "llm", "hooks", "structured-output"],
+  "license": "MIT"
+}

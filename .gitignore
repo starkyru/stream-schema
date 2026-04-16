@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.next/
+.DS_Store
+*.tsbuildinfo
+.env
+.env.*
+*.pack.gz
+*.pack.gz.old
