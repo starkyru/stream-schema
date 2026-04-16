@@ -7,22 +7,32 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsup src/index.ts --format cjs,esm --external react --external @stream-schema/core",
     "test": "vitest run"
   },
   "peerDependencies": {
     "react": ">=18.0.0"
   },
   "dependencies": {
-    "@stream-schema/core": "workspace:*"
+    "@stream-schema/core": "^0.1.0"
   },
   "keywords": ["react", "streaming", "ai", "llm", "hooks", "structured-output"],
-  "license": "MIT"
+  "license": "MIT",
+  "author": "starkyru",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starkyru/stream-schema.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/starkyru/stream-schema#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }

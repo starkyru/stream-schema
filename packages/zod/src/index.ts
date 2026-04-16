@@ -50,7 +50,7 @@ export function useSchemaStream<TSchema extends ZodTypeAny>({
           onError?.(new Error(`Schema validation failed: ${result.error.message}`));
           return;
         }
-        onComplete?.(result.data);
+        onComplete?.(result.data as DeepPartial<ZodInfer<TSchema>>);
       } else {
         onComplete?.(data);
       }

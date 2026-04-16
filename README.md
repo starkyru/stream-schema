@@ -4,6 +4,8 @@
 
 Most AI apps stream raw text. `stream-schema` lets you stream structured JSON - and watch your UI paint itself in real time as tokens arrive.
 
+![stream-schema demo](demo.gif)
+
 ```tsx
 const { data, status } = useStructuredStream<MealPlan>({ stream });
 

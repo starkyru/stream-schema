@@ -7,23 +7,33 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc && tsup src/index.ts --format cjs,esm --external react --external zod --external @stream-schema/core --external @stream-schema/react"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
     "zod": ">=3.0.0"
   },
   "dependencies": {
-    "@stream-schema/core": "workspace:*",
-    "@stream-schema/react": "workspace:*"
+    "@stream-schema/core": "^0.1.0",
+    "@stream-schema/react": "^0.1.0"
   },
-  "keywords": ["zod", "streaming", "ai", "llm", "react", "schema"],
-  "license": "MIT"
+  "keywords": ["zod", "streaming", "ai", "llm", "react", "schema", "structured-output"],
+  "license": "MIT",
+  "author": "starkyru",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starkyru/stream-schema.git",
+    "directory": "packages/zod"
+  },
+  "homepage": "https://github.com/starkyru/stream-schema#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }

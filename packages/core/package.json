@@ -7,16 +7,31 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
     }
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsc",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "test": "vitest run"
   },
-  "keywords": ["streaming", "json", "partial-json", "ai", "llm"],
-  "license": "MIT"
+  "keywords": ["streaming", "json", "partial-json", "ai", "llm", "structured-output"],
+  "license": "MIT",
+  "author": "starkyru",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starkyru/stream-schema.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/starkyru/stream-schema#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }
