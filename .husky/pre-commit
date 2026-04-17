@@ -1,0 +1,2 @@
+npx lint-staged
+(cd stream-schema/apps/demo && npx tsc --noEmit)

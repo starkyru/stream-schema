@@ -1,0 +1,28 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'stream-schema/apps/demo/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to stream-schema.ilia.to
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ilia
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd /home/ilia/apps/stream-schema
+            git pull origin main
+            cd stream-schema/apps/demo
+            npm ci
+            npm run build
+            pm2 reload ecosystem.config.js --update-env
