@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { useStructuredStream, createSimulatedStream } from '../lib/stream-schema';
 import { SAMPLES } from '../lib/samples';
-import type { StreamKey, TabKey, MealPlan, Startup, Travel } from '../lib/types';
+import type { TabKey, MealPlan, Startup, Travel } from '../lib/types';
 import { MealPlanUI } from './MealPlanUI';
 import { StartupUI } from './StartupUI';
 import { TravelUI } from './TravelUI';
@@ -37,7 +37,6 @@ export function DemoShell() {
     onChunk: setRawJSON,
   });
 
-  const activeStreamKey = activeTab as StreamKey;
   const activeStatus =
     activeTab === 'meal'
       ? mealStatus
@@ -50,6 +49,7 @@ export function DemoShell() {
 
   const handleGenerate = useCallback(async () => {
     if (activeTab === 'about') return;
+    const key = activeTab; // narrowed to StreamKey by the guard above
     setRawJSON('');
     streamKeyRef.current++;
 
@@ -57,13 +57,13 @@ export function DemoShell() {
       const res = await fetch('/api/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ demo: activeStreamKey }),
+        body: JSON.stringify({ demo: key }),
       });
       setStream(res.body!);
     } else {
-      setStream(createSimulatedStream(SAMPLES[activeStreamKey], 4, 16));
+      setStream(createSimulatedStream(SAMPLES[key], 4, 16));
     }
-  }, [activeTab, activeStreamKey, useRealAPI]);
+  }, [activeTab, useRealAPI]);
 
   const handleTabChange = (key: TabKey) => {
     setActiveTab(key);
@@ -74,11 +74,11 @@ export function DemoShell() {
   const renderStreamUI = () => {
     switch (activeTab) {
       case 'meal':
-        return <MealPlanUI data={mealData} status={mealStatus} />;
+        return <MealPlanUI data={mealData ?? {}} status={mealStatus} />;
       case 'startup':
-        return <StartupUI data={startupData} status={startupStatus} />;
+        return <StartupUI data={startupData ?? {}} status={startupStatus} />;
       case 'travel':
-        return <TravelUI data={travelData} status={travelStatus} />;
+        return <TravelUI data={travelData ?? {}} status={travelStatus} />;
       default:
         return null;
     }

@@ -12,8 +12,8 @@ export interface UseStructuredStreamOptions<T> extends StreamReaderOptions {
 }
 
 export interface UseStructuredStreamResult<T> {
-  /** Current best-effort parsed value. Updates on every token. */
-  data: DeepPartial<T>;
+  /** Current best-effort parsed value. Updates on every token. Undefined until first chunk arrives. */
+  data: DeepPartial<T> | undefined;
   /** Current streaming status. */
   status: StreamStatus;
   /** Error, if status === 'error'. */
@@ -39,7 +39,7 @@ export function useStructuredStream<T>({
   onError,
   extractJSON,
 }: UseStructuredStreamOptions<T>): UseStructuredStreamResult<T> {
-  const [data, setData] = useState<DeepPartial<T>>({} as DeepPartial<T>);
+  const [data, setData] = useState<DeepPartial<T> | undefined>(undefined);
   const [status, setStatus] = useState<StreamStatus>('idle');
   const [error, setError] = useState<Error | null>(null);
 
@@ -52,7 +52,7 @@ export function useStructuredStream<T>({
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
-    setData({} as DeepPartial<T>);
+    setData(undefined);
     setStatus('idle');
     setError(null);
   }, []);
@@ -65,7 +65,7 @@ export function useStructuredStream<T>({
 
     setStatus('streaming');
     setError(null);
-    setData({} as DeepPartial<T>);
+    setData(undefined);
 
     (async () => {
       try {

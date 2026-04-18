@@ -1,7 +1,10 @@
 // Recursively makes all properties optional and nullable - matches partial JSON state
-export type DeepPartial<T> = T extends object
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : T | undefined;
+export type DeepPartial<T> =
+  T extends Array<infer U>
+    ? Array<DeepPartial<U>>
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T | undefined;
 
 export type StreamStatus = 'idle' | 'streaming' | 'complete' | 'error';
 

@@ -9,7 +9,7 @@ export function MealPlanUI({
   data: DeepPartial<MealPlan>;
   status: StreamStatus;
 }) {
-  const items = (data.items ?? []) as Array<Partial<MealPlan['items'][0]>>;
+  const items = data.items ?? [];
   const skeletonCount = Math.max(0, 4 - items.length);
 
   return (

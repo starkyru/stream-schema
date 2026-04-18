@@ -35,6 +35,11 @@ export async function* readRawStream(
  *   render(partial); // updates live as tokens arrive
  * }
  */
+/** Single intentional runtime-to-type boundary. JSON structure must match T by caller contract. */
+function asPartial<T>(value: unknown): DeepPartial<T> {
+  return value as DeepPartial<T>;
+}
+
 export async function* streamStructured<T>(
   stream: ReadableStream<Uint8Array>,
   options: StreamReaderOptions & { signal?: AbortSignal } = {},
@@ -51,7 +56,7 @@ export async function* streamStructured<T>(
     const parsed = parsePartialJSON(accumulated);
     if (parsed !== undefined) {
       yield {
-        partial: parsed as DeepPartial<T>,
+        partial: asPartial<T>(parsed),
         done: false,
         raw: accumulated,
       };
@@ -61,7 +66,7 @@ export async function* streamStructured<T>(
   // Final yield with done: true
   const finalParsed = parsePartialJSON(accumulated);
   yield {
-    partial: (finalParsed ?? {}) as DeepPartial<T>,
+    partial: asPartial<T>(finalParsed ?? {}),
     done: true,
     raw: accumulated,
   };

@@ -3,7 +3,7 @@ import type { Startup } from '../lib/types';
 import { Skeleton } from './Skeleton';
 
 export function StartupUI({ data }: { data: DeepPartial<Startup>; status: StreamStatus }) {
-  const features = (data.features ?? []) as Array<Partial<Startup['features'][0]>>;
+  const features = data.features ?? [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>

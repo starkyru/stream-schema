@@ -7,9 +7,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-export type DeepPartial<T> = T extends object
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : T | undefined;
+export type DeepPartial<T> =
+  T extends Array<infer U>
+    ? Array<DeepPartial<U>>
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T | undefined;
 
 export type StreamStatus = 'idle' | 'streaming' | 'complete' | 'error';
 
@@ -22,7 +25,9 @@ export function parsePartialJSON(partial: string): unknown {
 
   try {
     return JSON.parse(trimmed);
-  } catch { /* continue */ }
+  } catch {
+    /* continue */
+  }
 
   return attemptCompletion(trimmed);
 }
@@ -35,10 +40,25 @@ function attemptCompletion(str: string): unknown {
 
   while (i < str.length) {
     const ch = str[i];
-    if (escaped) { escaped = false; i++; continue; }
-    if (ch === '\\' && inString) { escaped = true; i++; continue; }
-    if (ch === '"') { inString = !inString; i++; continue; }
-    if (inString) { i++; continue; }
+    if (escaped) {
+      escaped = false;
+      i++;
+      continue;
+    }
+    if (ch === '\\' && inString) {
+      escaped = true;
+      i++;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      i++;
+      continue;
+    }
+    if (inString) {
+      i++;
+      continue;
+    }
     if (ch === '{') closers.push('}');
     else if (ch === '[') closers.push(']');
     else if (ch === '}' || ch === ']') closers.pop();
@@ -57,7 +77,7 @@ function attemptCompletion(str: string): unknown {
       completed.lastIndexOf(','),
       completed.lastIndexOf(':'),
       completed.lastIndexOf('{'),
-      completed.lastIndexOf('['),
+      completed.lastIndexOf('[')
     );
     if (lastStructural <= 0) return undefined;
     return attemptCompletion(completed.slice(0, lastStructural));
@@ -69,7 +89,7 @@ function attemptCompletion(str: string): unknown {
 // ---------------------------------------------------------------------------
 async function* readRawStream(
   stream: ReadableStream<Uint8Array>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): AsyncGenerator<string> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
@@ -89,9 +109,14 @@ export interface StreamReaderOptions {
   extractJSON?: (chunk: string) => string;
 }
 
+/** Single intentional runtime-to-type boundary. JSON structure must match T by caller contract. */
+function asPartial<T>(value: unknown): DeepPartial<T> {
+  return value as DeepPartial<T>;
+}
+
 async function* streamStructured<T>(
   stream: ReadableStream<Uint8Array>,
-  options: StreamReaderOptions & { signal?: AbortSignal } = {},
+  options: StreamReaderOptions & { signal?: AbortSignal } = {}
 ): AsyncGenerator<{ partial: DeepPartial<T>; done: boolean; raw: string }> {
   const { extractJSON, signal } = options;
   let accumulated = '';
@@ -102,12 +127,12 @@ async function* streamStructured<T>(
     accumulated += text;
     const parsed = parsePartialJSON(accumulated);
     if (parsed !== undefined) {
-      yield { partial: parsed as DeepPartial<T>, done: false, raw: accumulated };
+      yield { partial: asPartial<T>(parsed), done: false, raw: accumulated };
     }
   }
 
   const finalParsed = parsePartialJSON(accumulated);
-  yield { partial: (finalParsed ?? {}) as DeepPartial<T>, done: true, raw: accumulated };
+  yield { partial: asPartial<T>(finalParsed ?? {}), done: true, raw: accumulated };
 }
 
 // ---------------------------------------------------------------------------
@@ -121,7 +146,7 @@ export interface UseStructuredStreamOptions<T> extends StreamReaderOptions {
 }
 
 export interface UseStructuredStreamResult<T> {
-  data: DeepPartial<T>;
+  data: DeepPartial<T> | undefined;
   status: StreamStatus;
   error: Error | null;
   reset: () => void;
@@ -134,7 +159,7 @@ export function useStructuredStream<T>({
   onChunk,
   extractJSON,
 }: UseStructuredStreamOptions<T>): UseStructuredStreamResult<T> {
-  const [data, setData] = useState<DeepPartial<T>>({} as DeepPartial<T>);
+  const [data, setData] = useState<DeepPartial<T> | undefined>(undefined);
   const [status, setStatus] = useState<StreamStatus>('idle');
   const [error, setError] = useState<Error | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -147,7 +172,7 @@ export function useStructuredStream<T>({
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
-    setData({} as DeepPartial<T>);
+    setData(undefined);
     setStatus('idle');
     setError(null);
   }, []);
@@ -158,7 +183,7 @@ export function useStructuredStream<T>({
     abortRef.current = controller;
     setStatus('streaming');
     setError(null);
-    setData({} as DeepPartial<T>);
+    setData(undefined);
 
     (async () => {
       try {
@@ -184,7 +209,7 @@ export function useStructuredStream<T>({
     })();
 
     return () => controller.abort();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stream]);
 
   return { data, status, error, reset };
@@ -196,7 +221,7 @@ export function useStructuredStream<T>({
 export function createSimulatedStream(
   json: string,
   charsPerChunk = 3,
-  baseDelayMs = 18,
+  baseDelayMs = 18
 ): ReadableStream<Uint8Array> {
   return new ReadableStream({
     async start(controller) {

@@ -38,7 +38,7 @@ export function TravelUI({ data }: { data: DeepPartial<Travel>; status: StreamSt
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {timeOfDay.map(({ key, label, emoji }) => {
-          const slot = data[key] as { activity?: string; tip?: string } | undefined;
+          const slot = data[key];
           return (
             <div
               key={key}
