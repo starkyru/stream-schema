@@ -1,0 +1,1 @@
+(cd stream-schema/apps/demo && npm run build)
